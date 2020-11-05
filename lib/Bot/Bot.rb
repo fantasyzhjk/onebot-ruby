@@ -35,7 +35,7 @@ module CQHttp
 
           @ws.on :close do
             emit :close
-            puts '已断开链接'
+            Utils.log Time.new, '!', '已断开连接'
             @ws = nil
             exit
           end
@@ -50,13 +50,13 @@ module CQHttp
 
       def sendPrivateMessage(msg, user_id)
         ret = { action: 'send_private_msg', params: { user_id: user_id, message: msg }, echo: 'BotPrivateMessage' }.to_json
-        puts "[#{Time.new.strftime('%Y-%m-%d %H:%M:%S')}][↑]: 发送至私聊 #{user_id} 的消息: #{msg}"
+        Utils.log Time.new, '↑', "发送至私聊 #{user_id} 的消息: #{msg}"
         @ws.send ret
       end
 
       def sendGroupMessage(msg, group_id)
         ret = { action: 'send_group_msg', params: { group_id: group_id, message: msg }, echo: 'BotGroupMessage' }.to_json
-        puts "[#{Time.new.strftime('%Y-%m-%d %H:%M:%S')}][↑]: 发送至群 #{group_id} 的消息: #{msg}"
+        Utils.log Time.new, '↑', "发送至群 #{group_id} 的消息: #{msg}"
         @ws.send ret
       end
 
@@ -69,31 +69,58 @@ module CQHttp
         tar.time = msg['time']
         if msg['meta_event_type'] == 'lifecycle' && msg['sub_type'] == 'connect'
           @selfID = msg['self_id']
-          puts "[#{Time.at(tar.time).strftime('%Y-%m-%d %H:%M:%S')}][!]: go-cqhttp连接成功, BotQQ: #{@selfID}"
+          Utils.log Time.at(tar.time), '!', "连接成功, BotQQ: #{@selfID}"
           emit :logged, @selfID
         end
-        if @debugmode == true
-          puts msg if msg['meta_event_type'] != 'heartbeat'
+        if @debugmode == true # 判断是否为debug模式
+          puts msg if msg['meta_event_type'] != 'heartbeat' # 过滤心跳
         end
-        if msg['post_type'] == 'message'
-          tar.user_id = msg['user_id']
-          tar.message_id = msg['message_id']
-          tar.message = msg['message']
-          sdr.age = msg['sender']['age']
+        case msg['post_type']
+        #
+        # 请求事件
+        #
+        when 'request'
+          case msg['request_type']
+          when 'group'
+            if msg['sub_type'] == 'invite' # 加群邀请
+              Utils.log Time.at(tar.time), '↓', "收到用户 #{msg['user_id']} 的加群 #{msg['group_id']} 请求 (#{msg['flag']})"
+            end
+          when 'friend' # 加好友邀请
+            Utils.log Time.at(tar.time), '↓', "收到用户 #{msg['user_id']} 的好友请求 (#{msg['flag']})"
+          end
+          emit :request, msg['request_type'], msg['sub_type'], msg['flag']
+        #
+        # 提醒事件
+        #
+        when 'notice'
+          case msg['notice_type']
+          when 'group_decrease' # 群数量减少
+            if msg['sub_type'] == 'kick_me' # 被踢出
+              Utils.log Time.at(tar.time), '!', "被 #{msg['operator_id']} 踢出群 #{msg['group_id']}"
+            end
+          end
+        #
+        # 消息事件
+        #
+        when 'message'
+          tar.user_id = msg['user_id'] # 用户id
+          tar.message_id = msg['message_id'] # 消息id
+          tar.message = msg['message'] # 消息内容
+          sdr.age = msg['sender']['age'] # 年龄
           sdr.nickname = msg['sender']['nickname'] # 原有用户名
-          sdr.sex = msg['sender']['sex']
-          tar.messagetype = msg['message_type']
-          # Group only
-          tar.group_id = msg['group_id']
+          sdr.sex = msg['sender']['sex'] # 性别
+          tar.messagetype = msg['message_type'] # 消息类型
+          # 下面仅群聊
+          tar.group_id = msg['group_id'] # 群id
           sdr.card = msg['sender']['card'] # 群昵称
           sdr.title = msg['sender']['title'] # 头衔
-          sdr.member_role = msg['sender']['role']
-          sdr.qqlevel = msg['sender']['level']
-          if tar.messagetype == 'group'
-            puts "[#{Time.at(tar.time).strftime('%Y-%m-%d %H:%M:%S')}][↓]: 收到群 #{tar.group_id} 内 #{sdr.nickname}(#{tar.user_id}) 的消息: #{tar.message} (#{tar.message_id})"
+          sdr.member_role = msg['sender']['role'] # 群成员地位
+          sdr.qqlevel = msg['sender']['level'] # 群成员等级
+          if tar.messagetype == 'group' # 判断是否为群聊
+            Utils.log Time.at(tar.time), '↓', "收到群 #{tar.group_id} 内 #{sdr.nickname}(#{tar.user_id}) 的消息: #{tar.message} (#{tar.message_id})"
             emit :groupMessage, tar.message, sdr, tar
           else
-            puts "[#{Time.at(tar.time).strftime('%Y-%m-%d %H:%M:%S')}][↓]: 收到好友 #{sdr.nickname}(#{tar.user_id}) 的消息: #{tar.message} (#{tar.message_id})"
+            Utils.log Time.at(tar.time), '↓', "收到好友 #{sdr.nickname}(#{tar.user_id}) 的消息: #{tar.message} (#{tar.message_id})"
             emit :privateMessage, tar.message, sdr, tar
           end
           emit :message, tar.message, sdr, tar
