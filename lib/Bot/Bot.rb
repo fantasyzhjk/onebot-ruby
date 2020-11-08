@@ -98,7 +98,13 @@ module CQHttp
             if msg['sub_type'] == 'kick_me' # 被踢出
               Utils.log Time.at(tar.time), '!', "被 #{msg['operator_id']} 踢出群 #{msg['group_id']}"
             end
+          when 'group_recall'
+            Utils.log Time.at(tar.time), '!', "群 #{msg['group_id']} 中 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
+          when 'friend_recall'
+            Utils.log Time.at(tar.time), '!', "好友 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
           end
+          emit :notice, msg['notice_type'], msg
+          
         #
         # 消息事件
         #
