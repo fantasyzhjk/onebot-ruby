@@ -15,7 +15,8 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files -z`.split("\x0")
   s.require_paths = ['lib']
 
-  #   s.add_runtime_dependency  'json', '~> 1.1'
-  #   s.add_runtime_dependency  'eventmachine', '~> 1.1'
-  #   s.add_runtime_dependency  'faye-websocket', '~> 1.1'
+  s.add_runtime_dependency  'json'
+  s.add_runtime_dependency  'eventmachine'
+  s.add_runtime_dependency  'faye-websocket'
+  s.add_runtime_dependency  'event_emitter'
 end

@@ -53,8 +53,8 @@ module CQHttp
         ret = { group_id: group_id, message: msg }.to_json
         data = JSON.parse(Utils.httpPost("#{url}/send_group_msg", ret))
         if data['status'] == 'ok'
-          message_id = data['data']['group_id']
-          Utils.log Time.new, '↑', "发送至群 #{user_id} 的消息: #{msg} (#{message_id})"
+          message_id = data['data']['message_id']
+          Utils.log Time.new, '↑', "发送至群 #{group_id} 的消息: #{msg} (#{message_id})"
           return message_id
         else
           Utils.log Time.new, '×', '发送消息失败'

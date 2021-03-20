@@ -3,8 +3,8 @@ module CQHttp
     Sender = Struct.new(:age, :member_role, :card, :qqlevel, :nickname, :title, :sex)
     Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message)
 
-    def self.connect(url, debugmode=false)
-      client = ::CQHttp::Bot::WebSocket.new(url, debugmode)
+    def self.connect(url:, debug:false)
+      client = ::CQHttp::Bot::WebSocket.new(url, debug)
       yield client if block_given?
       client.connect
       client
@@ -35,7 +35,7 @@ module CQHttp
 
           @ws.on :close do
             emit :close
-            Utils.log Time.new, '!', '已断开连接'
+            Utils.log Time.new, '!', '连接断开'
             @ws = nil
             exit
           end
