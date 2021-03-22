@@ -2,9 +2,11 @@ module CQHttp
   class Bot
     Sender = Struct.new(:age, :member_role, :card, :qqlevel, :nickname, :title, :sex)
     Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message)
-
-    def self.connect(url:, debug:false)
-      client = ::CQHttp::Bot::WebSocket.new(url, debug)
+    def self.connect(host:, port:)
+      url = URI::WS.build(host: host, port: port)
+      Api.setUrl()
+      Utils.log '正在连接到 ' << url.to_s
+      client = ::CQHttp::Bot::WebSocket.new(url)
       yield client if block_given?
       client.connect
       client
@@ -12,30 +14,25 @@ module CQHttp
 
     class WebSocket
       attr_accessor :url
-      attr_accessor :debugmode
       attr_accessor :selfID
 
       include EventEmitter
 
-      def initialize(url, debugmode)
+      def initialize(url)
         @url = url
-        @debugmode = debugmode
       end
 
       def connect
         EM.run do
-          @ws = Faye::WebSocket::Client.new(@url)
-
-          @ws.on :open do
-          end
+          @ws = Faye::WebSocket::Client.new(@url.to_s)
 
           @ws.on :message do |event|
             Thread.new { dataParse(event.data)}
           end
 
-          @ws.on :close do
-            emit :close
-            Utils.log Time.new, '!', '连接断开'
+          @ws.on :close do |event|
+            emit :close, event
+            Utils.log '连接断开'
             @ws = nil
             exit
           end
@@ -50,13 +47,13 @@ module CQHttp
 
       def sendPrivateMessage(msg, user_id)
         ret = { action: 'send_private_msg', params: { user_id: user_id, message: msg }, echo: 'BotPrivateMessage' }.to_json
-        Utils.log Time.new, '↑', "发送至私聊 #{user_id} 的消息: #{msg}"
+        Utils.log "发送至私聊 #{user_id} 的消息: #{msg}"
         @ws.send ret
       end
 
       def sendGroupMessage(msg, group_id)
         ret = { action: 'send_group_msg', params: { group_id: group_id, message: msg }, echo: 'BotGroupMessage' }.to_json
-        Utils.log Time.new, '↑', "发送至群 #{group_id} 的消息: #{msg}"
+        Utils.log "发送至群 #{group_id} 的消息: #{msg}"
         @ws.send ret
       end
 
@@ -69,12 +66,10 @@ module CQHttp
         tar.time = msg['time']
         if msg['meta_event_type'] == 'lifecycle' && msg['sub_type'] == 'connect'
           @selfID = msg['self_id']
-          Utils.log Time.at(tar.time), '!', "连接成功, BotQQ: #{@selfID}"
+          Utils.log "连接成功, BotQQ: #{@selfID}"
           emit :logged, @selfID
         end
-        if @debugmode == true # 判断是否为debug模式
-          puts msg if msg['meta_event_type'] != 'heartbeat' # 过滤心跳
-        end
+        Utils.log msg, Logger::DEBUG if msg['meta_event_type'] != 'heartbeat' # 过滤心跳
         case msg['post_type']
         #
         # 请求事件
@@ -83,10 +78,10 @@ module CQHttp
           case msg['request_type']
           when 'group'
             if msg['sub_type'] == 'invite' # 加群邀请
-              Utils.log Time.at(tar.time), '↓', "收到用户 #{msg['user_id']} 的加群 #{msg['group_id']} 请求 (#{msg['flag']})"
+              Utils.log "收到用户 #{msg['user_id']} 的加群 #{msg['group_id']} 请求 (#{msg['flag']})"
             end
           when 'friend' # 加好友邀请
-            Utils.log Time.at(tar.time), '↓', "收到用户 #{msg['user_id']} 的好友请求 (#{msg['flag']})"
+            Utils.log "收到用户 #{msg['user_id']} 的好友请求 (#{msg['flag']})"
           end
           emit :request, msg['request_type'], msg['sub_type'], msg['flag']
         #
@@ -96,12 +91,12 @@ module CQHttp
           case msg['notice_type']
           when 'group_decrease' # 群数量减少
             if msg['sub_type'] == 'kick_me' # 被踢出
-              Utils.log Time.at(tar.time), '!', "被 #{msg['operator_id']} 踢出群 #{msg['group_id']}"
+              Utils.log "被 #{msg['operator_id']} 踢出群 #{msg['group_id']}"
             end
           when 'group_recall'
-            Utils.log Time.at(tar.time), '!', "群 #{msg['group_id']} 中 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
+            Utils.log "群 #{msg['group_id']} 中 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
           when 'friend_recall'
-            Utils.log Time.at(tar.time), '!', "好友 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
+            Utils.log "好友 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
           end
           emit :notice, msg['notice_type'], msg
           
@@ -123,10 +118,10 @@ module CQHttp
           sdr.member_role = msg['sender']['role'] # 群成员地位
           sdr.qqlevel = msg['sender']['level'] # 群成员等级
           if tar.messagetype == 'group' # 判断是否为群聊
-            Utils.log Time.at(tar.time), '↓', "收到群 #{tar.group_id} 内 #{sdr.nickname}(#{tar.user_id}) 的消息: #{tar.message} (#{tar.message_id})"
+            Utils.log "收到群 #{tar.group_id} 内 #{sdr.nickname}(#{tar.user_id}) 的消息: #{tar.message} (#{tar.message_id})"
             emit :groupMessage, tar.message, sdr, tar
           else
-            Utils.log Time.at(tar.time), '↓', "收到好友 #{sdr.nickname}(#{tar.user_id}) 的消息: #{tar.message} (#{tar.message_id})"
+            Utils.log "收到好友 #{sdr.nickname}(#{tar.user_id}) 的消息: #{tar.message} (#{tar.message_id})"
             emit :privateMessage, tar.message, sdr, tar
           end
           emit :message, tar.message, sdr, tar
