@@ -3,8 +3,8 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |s|
   s.name = 'ruby-cqhttp'
-  s.version       = '0.0.4'
-  s.date          = '2021-03-22'
+  s.version       = '0.0.5'
+  s.date          = '2021-03-23'
   s.summary       = 'ruby-cqhttp for osucat'
   s.description   = 'ruby-cqhttp for osucat'
   s.authors       = ['fantasyzhjk']
@@ -15,11 +15,11 @@ Gem::Specification.new do |s|
   s.license       = 'MIT'
   s.files         = `git ls-files -z`.split("\x0")
   s.require_paths = ['lib']
-  s.required_ruby_version = '>= 3.0'
+  s.required_ruby_version = '>= 2.7.0'
 
   s.add_runtime_dependency  'json'
   s.add_runtime_dependency  'logger'
-  s.add_runtime_dependency  'uri'
+  s.add_runtime_dependency  'uri', '~> 0.10.1'
   s.add_runtime_dependency  'eventmachine'
   s.add_runtime_dependency  'faye-websocket'
   s.add_runtime_dependency  'event_emitter'
