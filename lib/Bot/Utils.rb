@@ -6,9 +6,9 @@ module CQHttp
         logger.level = 'INFO'
         logger.formatter = proc do |severity, datetime, progname, msg|
             if progname == nil
-                "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}][#{severity}]: #{msg}\n"
+                "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}][#{severity}]: #{msg.gsub(/\n/,'\n').gsub(/\r/,'\r') }\n"
             else
-                "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}][#{progname}][#{severity}]: #{msg}\n"
+                "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}][#{progname}][#{severity}]: #{msg.gsub(/\n/,'\n').gsub(/\r/,'\r') }\n"
             end
         end
         logger
@@ -25,8 +25,8 @@ module CQHttp
       end
 
       def log(str, severity=Logger::INFO, app="RUBY-CQHTTP")
-        @stdLogger.log(severity, "#{str}", app)
-        @fileLogger.log(severity, "#{str}", app) if @loggerFile
+        @stdLogger.log(severity, str, app)
+        @fileLogger.log(severity, str, app) if @loggerFile
       end
 
       def httpPost(url, ret)

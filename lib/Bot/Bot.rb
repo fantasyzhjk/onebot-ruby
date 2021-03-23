@@ -56,6 +56,11 @@ module CQHttp
         Utils.log "发送至群 #{group_id} 的消息: #{msg}"
         @ws.send ret
       end
+      
+      def sendMessage(msg, target)
+        sendGroupMessage msg, target.group_id if target.messagetype == 'group'
+        sendPrivateMessage msg, target.user_id if target.messagetype == 'private'
+      end
 
       private
 
