@@ -16,7 +16,7 @@
 在 `Gemfile` 中添加
 
 ```ruby
-gem 'eventmachine'
+gem 'ruby-cqhttp'
 ```
 
 然后运行
