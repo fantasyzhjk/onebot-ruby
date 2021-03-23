@@ -9,9 +9,8 @@ Gem::Specification.new do |s|
   s.description   = 'ruby-cqhttp for osucat'
   s.authors       = ['fantasyzhjk']
   s.email         = 'fantasyzhjk@outlook.com'
-  s.files         = ['lib/ruby-cqhttp.rb']
   s.platform    = Gem::Platform::RUBY
-  s.homepage      = 'http://rubygems.org/gems/ruby-cqhttp'
+  s.homepage      = 'https://github.com/fantasyzhjk/ruby-cqhttp/'
   s.license       = 'MIT'
   s.files         = `git ls-files -z`.split("\x0")
   s.require_paths = ['lib']
