@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |s|
   s.name = 'ruby-cqhttp'
-  s.version       = '0.0.5'
+  s.version       = '0.0.6'
   s.date          = '2021-03-23'
   s.summary       = 'ruby-cqhttp for osucat'
   s.description   = 'ruby-cqhttp for osucat'
