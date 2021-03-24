@@ -1,4 +1,8 @@
 module CQHttp
+  # 各种工具包
+  #
+  # Example:
+  #   CQHttp::Utils.log str, Logger::INFO
   class Utils
     attr_accessor :stdLogger, :fileLogger, :loggerFile
     class << self
@@ -23,7 +27,7 @@ module CQHttp
       # 输出日志
       #
       # @param str [String]
-      # @param severity [Logger::type]
+      # @param severity [Logger::INFO, Logger::DEBUG, Logger::WARN, Logger::ERROR]
       # @param app [String]
       def log(str, severity=Logger::INFO, app="RUBY-CQHTTP")
         @stdLogger.log(severity, str, app)
@@ -33,7 +37,7 @@ module CQHttp
       # post发包
       #
       # @param url [URI]
-      # @param ret [JsonString]
+      # @param ret [String]
       # @return [String]
       def httpPost(url, ret)
         req = Net::HTTP::Post.new(url.path, { 'Content-Type' => 'application/json' })
