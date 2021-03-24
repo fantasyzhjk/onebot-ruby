@@ -1,5 +1,11 @@
 module CQHttp
+  # OneBot标准API
+  # [OneBot文档] (https://github.com/howmanybots/onebot)
+  #
+  # Example:
+  #   CQHttp::Api.getImage file
   class Api
+    # @return [URI] HTTP API链接
     attr_accessor :apiUrl
     class << self
 

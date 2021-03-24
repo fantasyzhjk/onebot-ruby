@@ -4,6 +4,12 @@ module CQHttp
   # Example:
   #   CQHttp::Utils.log str, Logger::INFO
   class Utils
+    # @!method stdLogger
+    #   @return [Logger] 终端Logger
+    # @!method fileLogger
+    #   @return [Logger] 文件Logger
+    # @!method loggerFile
+    #   @return [String] Logger文件地址
     attr_accessor :stdLogger, :fileLogger, :loggerFile
     class << self
 
@@ -49,10 +55,10 @@ module CQHttp
       end
       alias post httpPost
       
-      # 消息转义
-      # &amp; -> &
-      # &#91; -> [
-      # &#93; -> ]
+      # 消息转义  
+      # &amp; -> &  
+      # &#91; -> [  
+      # &#93; -> ]  
       #
       # @param msg [String]
       # @return [String]
@@ -63,10 +69,10 @@ module CQHttp
         msg
       end
       
-      # 消息反转义
-      # & -> &amp;
-      # [ -> &#91;
-      # ] -> &#93;
+      # 消息反转义  
+      # & -> &amp;  
+      # [ -> &#91;  
+      # ] -> &#93;  
       #
       # @param msg [String]
       # @return [String]

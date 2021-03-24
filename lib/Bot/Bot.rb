@@ -1,16 +1,55 @@
 module CQHttp
-  # connect
+  # 消息处理，ws连接
   #
   # Example:
   #   CQHttp::Bot.connect host: host, port: port {|bot| ... }
   class Bot
+    # 发送人信息
+    # 
+    # @!attribute age
+    #    @return [Number] 年龄
+    # @!attribute member_role
+    #    @return [String] 角色，owner 或 admin 或 member
+    # @!attribute card
+    #    @return [String] 群名片／备注
+    # @!attribute user_id
+    #    @return [Number] 发送者 QQ 号
+    # @!attribute qqlevel
+    #    @return [String] 成员等级
+    # @!attribute nickname
+    #    @return [String] 昵称
+    # @!attribute title
+    #    @return [String] 专属头衔
+    # @!attribute sex
+    #    @return [String] 性别，male 或 female 或 unknown
     Sender = Struct.new(:age, :member_role, :card, :user_id, :qqlevel, :nickname, :title, :sex)
-    Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message, :raw_message)
+    # 消息事件数据
+    #
+    # @!attribute messagetype
+    #   @return [String] 成员等级
+    # @!attribute time
+    #   @return [Number] 事件发生的时间戳
+    # @!attribute group_id
+    #   @return [Number] 群号
+    # @!attribute user_id
+    #   @return [Number] 发送者 QQ 号
+    # @!attribute message_id
+    #   @return [Number] 消息 ID
+    # @!attribute message
+    #   @return [String] 消息内容
+    # @!attribute raw_message
+    #   @return [String] 原始消息内容
+    # @!attribute sub_type
+    #   @return [String] 消息子类型，私聊中如果是好友则是 friend，如果是群临时会话则是 group，群聊中正常消息是 normal，匿名消息是 anonymous，系统提示（如「管理员已禁止群内匿名聊天」）是 notice
+    # @!attribute anonymous
+    #   @return [Hash] 匿名信息，如果不是匿名消息则为 null
+    Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message, :raw_message, :sub_type, :anonymous)
     
-    # 连接 ws
+    # 新建连接
     #
     # @param host [String]
     # @param port [Number]
+    # @return [WebSocket]
     def self.connect(host:, port:)
       url = URI::WS.build(host: host, port: port)
       Api.setUrl()
@@ -21,17 +60,23 @@ module CQHttp
       client
     end
 
+    # WebSocket连接处理部分
     class WebSocket
+      # @return [URI] WS URL
       attr_accessor :url
+      # @return [Faye::WebSocket::Client] WS Conn
       attr_accessor :ws
+      # @return [Number] self QQ id
       attr_accessor :selfID
 
       include EventEmitter
 
+      # 设置 WS URL
       def initialize(url)
         @url = url
       end
 
+      # 连接 WS
       def connect
         EM.run do
           @ws = Faye::WebSocket::Client.new(@url.to_s)
@@ -143,8 +188,10 @@ module CQHttp
           sdr.nickname = msg['sender']['nickname'] # 原有用户名
           sdr.sex = msg['sender']['sex'] # 性别
           tar.messagetype = msg['message_type'] # 消息类型
+          tar.sub_type = msg['sub_type'] # 消息子类型
           # 下面仅群聊
           tar.group_id = msg['group_id'] # 群id
+          tar.anonymous = msg['anonymous'] # 匿名信息
           sdr.card = msg['sender']['card'] # 群昵称
           sdr.title = msg['sender']['title'] # 头衔
           sdr.member_role = msg['sender']['role'] # 群成员地位
