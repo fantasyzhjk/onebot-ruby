@@ -33,6 +33,7 @@ module CQHttp
         else
           Utils.log '设置群头像失败', Logger::WARN
         end
+        return data['data']
       end
 
       # 下载图片(未完成)
@@ -46,10 +47,10 @@ module CQHttp
         data = JSON.parse(Utils.httpPost(url, ret))
         if data['status'] == 'ok'
           Utils.log '下载图片成功'
-          return data['data']
         else
           Utils.log '下载图片失败', Logger::WARN
         end
+        return data['data']
       end
 
       # 获取消息
@@ -63,10 +64,10 @@ module CQHttp
         data = JSON.parse(Utils.httpPost(url, ret))
         if data['status'] == 'ok'
           Utils.log '消息获取成功'
-          return data['data']
         else
           Utils.log '消息获取失败', Logger::WARN
         end
+        return data['data']
       end
 
       # 发送私聊消息
@@ -82,10 +83,10 @@ module CQHttp
         if data['status'] == 'ok'
           message_id = data['data']['message_id']
           Utils.log "发送至私聊 #{user_id} 的消息: #{msg} (#{message_id})"
-          return message_id
         else
           Utils.log '发送消息失败', Logger::WARN
         end
+        return data['data']
       end
 
       # 发送群聊消息
@@ -101,25 +102,28 @@ module CQHttp
         if data['status'] == 'ok'
           message_id = data['data']['message_id']
           Utils.log "发送至群 #{group_id} 的消息: #{msg} (#{message_id})"
-          return message_id
         else
           Utils.log '发送消息失败', Logger::WARN
         end
+        return data['data']
       end
 
       # 接受好友邀请
       #
       # @param flag [String]
+      # @param reason [String]
       # @param url [URI]
-      # @return [Hash]
-      def acceptFriendRequest(flag, url=@apiUrl)
+      # @return [Boolean]
+      def acceptFriendRequest(flag, reason=nil, url=@apiUrl)
         url.path = "/set_friend_add_request"
-        ret = { flag: flag, approve: true }.to_json
+        ret = { flag: flag, approve: true, remark: reason }.to_json
         data = JSON.parse(Utils.httpPost(url, ret))
         if data['status'] == 'ok'
           Utils.log '已通过好友请求'
+          true
         else
           Utils.log '请求通过失败', Logger::WARN
+          false
         end
       end
 
@@ -127,15 +131,17 @@ module CQHttp
       #
       # @param flag [String]
       # @param url [URI]
-      # @return [Hash]
+      # @return [Boolean]
       def refuseFriendRequest(flag, url=@apiUrl)
         url.path = "/set_friend_add_request"
         ret = { flag: flag, approve: false }.to_json
         user_id = JSON.parse(Utils.httpPost(url, ret))
         if data['status'] == 'ok'
           Utils.log '已拒绝好友请求'
+          true
         else
           Utils.log '请求拒绝失败', Logger::WARN
+          false
         end
       end
 
@@ -162,16 +168,19 @@ module CQHttp
       #
       # @param flag [String]
       # @param sub_type [String]
+      # @param reason [String]
       # @param url [URI]
       # @return [Boolean]
-      def refuseGroupRequest(flag, sub_type, url=@apiUrl)
+      def refuseGroupRequest(flag, sub_type, reason=nil, url=@apiUrl)
         url.path = "/set_group_add_request"
-        ret = { flag: flag, sub_type: sub_type, approve: false }.to_json
+        ret = { flag: flag, sub_type: sub_type, approve: false, reason: reason }.to_json
         data = JSON.parse(Utils.httpPost(url, ret))
         if data['status'] == 'ok'
           Utils.log '已拒绝加群请求'
+          true
         else
           Utils.log '请求拒绝失败', Logger::WARN
+          false
         end
       end
     end

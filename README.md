@@ -7,6 +7,8 @@
 
 用 Ruby 写 QQ 机器人！
 
+本库还在快速迭代更新中。。
+
 ## 使用
 
 安装
@@ -48,11 +50,11 @@ CQHttp::Bot.connect host: '127.0.0.1', port: 6700 do |bot|
   end
   
   # 自动同意群邀请和好友请求
-  bot.on :request do |request_type, sub_type, flag|
+  bot.on :request do |request_type, data|
     if request_type == 'group'
-      CQHttp::Api.acceptGroupRequest(flag, sub_type) if sub_type == 'invite'
+      CQHttp::Api.acceptGroupRequest(data['flag'], data['sub_type']) if data['sub_type'] == 'invite'
     elsif request_type == 'friend'
-      CQHttp::Api.acceptFriendRequest(flag)
+      CQHttp::Api.acceptFriendRequest(data['flag'])
     end
   end
 end

@@ -73,6 +73,7 @@ module CQHttp
 
       # 设置 WS URL
       def initialize(url)
+        @queueList = {}
         @url = url
       end
 
@@ -103,20 +104,39 @@ module CQHttp
       #
       # @param msg [String]
       # @param user_id [Number]
+      # @return [Hash]
       def sendPrivateMessage(msg, user_id)
-        ret = { action: 'send_private_msg', params: { user_id: user_id, message: msg }, echo: 'BotPrivateMessage' }.to_json
-        Utils.log "发送至私聊 #{user_id} 的消息: #{msg}"
-        @ws.send ret
+        echo = Time.now.to_i.to_s
+        params = { action: 'send_private_msg', params: { user_id: user_id, message: msg }, echo: echo }.to_json
+        @ws.send params
+        @queueList[echo] = Queue.new
+        ret = @queueList[echo].pop
+        if parseRet(ret)
+          Utils.log "发送至私聊 #{user_id} 的消息: #{msg} (#{ret['data']['message_id']})"
+        else
+          Utils.log "发送消息失败，错误码: #{ret['msg']}, 错误消息: #{ret['wording']}", Logger::WARN
+        end
+        return ret['data']
       end
 
       # 发送群聊消息
       #
       # @param msg [String]
       # @param group_id [Number]
+      # @return [Hash]
       def sendGroupMessage(msg, group_id)
-        ret = { action: 'send_group_msg', params: { group_id: group_id, message: msg }, echo: 'BotGroupMessage' }.to_json
-        Utils.log "发送至群 #{group_id} 的消息: #{msg}"
-        @ws.send ret
+        echo = Time.now.to_i.to_s
+        params = { action: 'send_group_msg', params: { group_id: group_id, message: msg }, echo: echo }.to_json
+        @ws.send params
+        @queueList[echo] = Queue.new
+        ret = @queueList[echo].pop
+        @queueList.delete(echo)
+        if parseRet(ret)
+          Utils.log "发送至群 #{group_id} 的消息: #{msg} (#{ret['data']['message_id']})"
+        else
+          Utils.log "发送消息失败，错误码: #{ret['msg']}, 错误消息: #{ret['wording']}", Logger::WARN
+        end
+        return ret['data']
       end
       
       # 发送消息
@@ -124,13 +144,21 @@ module CQHttp
       #
       # @param msg [String]
       # @param target [Struct]
+      # @return [Hash]
       def sendMessage(msg, target)
-        sendGroupMessage msg, target.group_id if target.messagetype == 'group'
-        sendPrivateMessage msg, target.user_id if target.messagetype == 'private'
+        return sendGroupMessage msg, target.group_id if target.messagetype == 'group'
+        return sendPrivateMessage msg, target.user_id if target.messagetype == 'private'
       end
 
       private
 
+      #
+      #  解析API返回
+      #
+      def parseRet(ret)
+        return true if ret['status'] == 'ok'
+        return false if ret['status'] == 'failed'
+      end
       #
       #  消息解析部分
       #
@@ -145,6 +173,12 @@ module CQHttp
           emit :logged, @selfID
         end
         Utils.log data, Logger::DEBUG if msg['meta_event_type'] != 'heartbeat' # 过滤心跳
+        #
+        # 函数回调
+        #
+        if msg.include?('echo')
+          @queueList[msg['echo']] << msg
+        end
         case msg['post_type']
         #
         # 请求事件
@@ -152,25 +186,35 @@ module CQHttp
         when 'request'
           case msg['request_type']
           when 'group'
-            if msg['sub_type'] == 'invite' # 加群邀请
-              Utils.log "收到用户 #{msg['user_id']} 的加群 #{msg['group_id']} 请求 (#{msg['flag']})"
-            end
+            Utils.log "收到用户 #{msg['user_id']} 加群 #{msg['group_id']} 的请求 (#{msg['flag']})" if msg['sub_type'] == 'add' # 加群请求
+            Utils.log "收到用户 #{msg['user_id']} 的加群 #{msg['group_id']} 请求 (#{msg['flag']})" if msg['sub_type'] == 'invite' # 加群邀请
           when 'friend' # 加好友邀请
             Utils.log "收到用户 #{msg['user_id']} 的好友请求 (#{msg['flag']})"
           end
-          emit :request, msg['request_type'], msg['sub_type'], msg['flag']
+          emit :request, msg['request_type'], msg
         #
         # 提醒事件
         #
         when 'notice'
           case msg['notice_type']
-          when 'group_decrease' # 群数量减少
-            if msg['sub_type'] == 'kick_me' # 被踢出
-              Utils.log "被 #{msg['operator_id']} 踢出群 #{msg['group_id']}"
-            end
-          when 'group_recall'
-            Utils.log "群 #{msg['group_id']} 中 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
-          when 'friend_recall'
+          when 'group_admin' # 群管理员变动
+            Utils.log "群 #{msg['group_id']} 内 #{msg['user_id']} 成了管理员" if msg['sub_type'] == 'set' # 设置管理员
+            Utils.log "群 #{msg['group_id']} 内 #{msg['user_id']} 没了管理员" if msg['sub_type'] == 'unset' # 取消管理员
+          when 'group_increase' # 群成员增加
+            Utils.log "#{msg['operator_id']} 已同意 #{msg['user_id']} 进入了群 #{msg['group_id']}" if msg['sub_type'] == 'approve' # 管理员已同意入群
+            Utils.log "#{msg['operator_id']} 邀请 #{msg['user_id']} 进入了群 #{msg['group_id']}" if msg['sub_type'] == 'invite' # 管理员邀请入群
+          when 'group_decrease' # 群成员减少
+            Utils.log "被 #{msg['operator_id']} 踢出了群 #{msg['group_id']}" if msg['sub_type'] == 'kick_me' # 登录号被踢
+            Utils.log "#{msg['user_id']} 被 #{msg['operator_id']} 踢出了群 #{msg['group_id']}" if msg['sub_type'] == 'kick' # 成员被踢
+            Utils.log "#{msg['operator_id']} 退出了群 #{msg['group_id']}" if msg['sub_type'] == 'leave' # 主动退群
+          when 'group_ban' # 群禁言
+            Utils.log "群 #{msg['group_id']} 内 #{msg['user_id']} 被 #{msg['operator_id']} 禁言了 #{msg['duration']} 秒" if msg['sub_type'] == 'ban' # 禁言
+            Utils.log "群 #{msg['group_id']} 内 #{msg['user_id']} 被 #{msg['operator_id']} 解除禁言" if msg['sub_type'] == 'lift_ban' # 解除禁言
+          when 'friend_add' # 好友添加
+            Utils.log "#{msg['user_id']} 成了你的好友"
+          when 'group_recall' # 群消息撤回
+            Utils.log "群 #{msg['group_id']} 内 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
+          when 'friend_recall' # 好友消息撤回
             Utils.log "好友 #{msg['user_id']} 撤回了一条消息 (#{msg['message_id']})"
           end
           emit :notice, msg['notice_type'], msg
