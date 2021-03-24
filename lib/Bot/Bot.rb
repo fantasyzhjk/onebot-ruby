@@ -1,7 +1,17 @@
 module CQHttp
+  # connect
+  #
+  # Example:
+  #   bot = CQHttp::Bot.connect host: host, port: port
   class Bot
     Sender = Struct.new(:age, :member_role, :card, :qqlevel, :nickname, :title, :sex)
     Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message)
+    
+    # 连接 ws
+    #
+    # @param host [String]
+    # @param port [Number]
+    # @return [Class]
     def self.connect(host:, port:)
       url = URI::WS.build(host: host, port: port)
       Api.setUrl()
@@ -14,6 +24,7 @@ module CQHttp
 
     class WebSocket
       attr_accessor :url
+      attr_accessor :ws
       attr_accessor :selfID
 
       include EventEmitter
@@ -27,7 +38,7 @@ module CQHttp
           @ws = Faye::WebSocket::Client.new(@url.to_s)
 
           @ws.on :message do |event|
-            Thread.new { dataParse(event.data)}
+            Thread.new { dataParse(event.data) }
           end
 
           @ws.on :close do |event|
@@ -44,19 +55,31 @@ module CQHttp
         end
       end
 
-
+      # 发送私聊消息
+      #
+      # @param msg [String]
+      # @param user_id [Number]
       def sendPrivateMessage(msg, user_id)
         ret = { action: 'send_private_msg', params: { user_id: user_id, message: msg }, echo: 'BotPrivateMessage' }.to_json
         Utils.log "发送至私聊 #{user_id} 的消息: #{msg}"
         @ws.send ret
       end
 
+      # 发送群聊消息
+      #
+      # @param msg [String]
+      # @param group_id [Number]
       def sendGroupMessage(msg, group_id)
         ret = { action: 'send_group_msg', params: { group_id: group_id, message: msg }, echo: 'BotGroupMessage' }.to_json
         Utils.log "发送至群 #{group_id} 的消息: #{msg}"
         @ws.send ret
       end
       
+      # 发送消息
+      # 根据 target [Struct] 自动选择
+      #
+      # @param msg [String]
+      # @param target [Struct]
       def sendMessage(msg, target)
         sendGroupMessage msg, target.group_id if target.messagetype == 'group'
         sendPrivateMessage msg, target.user_id if target.messagetype == 'private'
@@ -64,6 +87,9 @@ module CQHttp
 
       private
 
+      #
+      #  消息解析部分
+      #
       def dataParse(data)
         msg = JSON.parse(data)
         sdr = Sender.new

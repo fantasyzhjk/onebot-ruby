@@ -2,9 +2,22 @@ module CQHttp
   class Api
     attr_accessor :apiUrl
     class << self
+
+      # 设置API地址
+      #
+      # @param apiIp [String]
+      # @param apiPort [Number]
+      # @return [URI]
       def setUrl(apiIp:'127.0.0.1', apiPort:5700)
         @apiUrl = URI::HTTP.build(host: apiIp, port: apiPort)
       end
+
+      # 设置群名
+      #
+      # @param group_id [Number]
+      # @param group_name [String]
+      # @param url [URI]
+      # @return [Hash]
       def setGroupName(group_id, group_name, url=@apiUrl)
         url.path = "/set_group_name"
         ret = { group_id: group_id.to_i, group_name: group_name }.to_json
@@ -16,7 +29,12 @@ module CQHttp
         end
       end
 
-      def getImage(file, url=@apiUrl)   # UNFINSHED
+      # 下载图片(未完成)
+      #
+      # @param file [String]
+      # @param url [URI]
+      # @return [Hash]
+      def getImage(file, url=@apiUrl)
         url.path = "/get_image"
         ret = { file: file }.to_json
         data = JSON.parse(Utils.httpPost(url, ret))
@@ -28,7 +46,12 @@ module CQHttp
         end
       end
 
-      def get_msg(message_id, url=@apiUrl)   # UNFINSHED
+      # 获取消息
+      #
+      # @param message_id [Number]
+      # @param url [URI]
+      # @return [Hash]
+      def get_msg(message_id, url=@apiUrl)
         url.path = "/get_msg"
         ret = { message_id: message_id }.to_json
         data = JSON.parse(Utils.httpPost(url, ret))
@@ -38,9 +61,14 @@ module CQHttp
         else
           Utils.log '消息获取失败', Logger::WARN
         end
-        
       end
 
+      # 发送私聊消息
+      #
+      # @param msg [String]
+      # @param user_id [Number]
+      # @param url [URI]
+      # @return [Hash]
       def sendPrivateMessage(msg, user_id, url=@apiUrl)
         url.path = "/send_private_msg"
         ret = { user_id: user_id, message: msg }.to_json
@@ -54,6 +82,12 @@ module CQHttp
         end
       end
 
+      # 发送群聊消息
+      #
+      # @param msg [String]
+      # @param group_id [Number]
+      # @param url [URI]
+      # @return [Hash]
       def sendGroupMessage(msg, group_id, url=@apiUrl)
         url.path = "/send_group_msg"
         ret = { group_id: group_id, message: msg }.to_json
@@ -67,6 +101,11 @@ module CQHttp
         end
       end
 
+      # 接受好友邀请
+      #
+      # @param flag [String]
+      # @param url [URI]
+      # @return [Hash]
       def acceptFriendRequest(flag, url=@apiUrl)
         url.path = "/set_friend_add_request"
         ret = { flag: flag, approve: true }.to_json
@@ -78,6 +117,11 @@ module CQHttp
         end
       end
 
+      # 拒绝好友邀请
+      #
+      # @param flag [String]
+      # @param url [URI]
+      # @return [Hash]
       def refuseFriendRequest(flag, url=@apiUrl)
         url.path = "/set_friend_add_request"
         ret = { flag: flag, approve: false }.to_json
@@ -89,17 +133,31 @@ module CQHttp
         end
       end
 
+      # 接受加群请求
+      #
+      # @param flag [String]
+      # @param sub_type [String]
+      # @param url [URI]
+      # @return [Boolean]
       def acceptGroupRequest(flag, sub_type, url=@apiUrl)
         url.path = "/set_group_add_request"
         ret = { flag: flag, sub_type: sub_type, approve: true }.to_json
         data = JSON.parse(Utils.httpPost(url, ret))
         if data['status'] == 'ok'
           Utils.log '已通过加群请求'
+          true
         else
           Utils.log '请求通过失败', Logger::WARN
+          false
         end
       end
 
+      # 拒绝加群请求
+      #
+      # @param flag [String]
+      # @param sub_type [String]
+      # @param url [URI]
+      # @return [Boolean]
       def refuseGroupRequest(flag, sub_type, url=@apiUrl)
         url.path = "/set_group_add_request"
         ret = { flag: flag, sub_type: sub_type, approve: false }.to_json

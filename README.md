@@ -3,6 +3,8 @@
 [![Gem Version](https://badge.fury.io/rb/ruby-cqhttp.svg)](https://badge.fury.io/rb/ruby-cqhttp)
 [![yard docs](http://img.shields.io/badge/yard-docs-blue.svg)](https://www.rubydoc.info/gems/ruby-cqhttp)
 
+一个基于 OneBot 标准的 QQ 机器人框架
+
 用 Ruby 写 QQ 机器人！
 
 ## 使用
@@ -22,8 +24,6 @@ gem 'ruby-cqhttp'
 然后运行
 
     $ bundle
-
-安装
 
 ## 示例
 

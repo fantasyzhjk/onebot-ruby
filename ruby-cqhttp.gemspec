@@ -5,8 +5,8 @@ Gem::Specification.new do |s|
   s.name = 'ruby-cqhttp'
   s.version       = '0.0.6'
   s.date          = '2021-03-23'
-  s.summary       = 'ruby-cqhttp for osucat'
-  s.description   = 'ruby-cqhttp for osucat'
+  s.summary       = '一个基于 OneBot 标准的 QQ 机器人框架'
+  s.description   = '一个基于 OneBot 标准的 QQ 机器人框架'
   s.authors       = ['fantasyzhjk']
   s.email         = 'fantasyzhjk@outlook.com'
   s.platform    = Gem::Platform::RUBY
