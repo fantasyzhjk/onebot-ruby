@@ -2,16 +2,19 @@ module CQHttp
   # connect
   #
   # Example:
-  #   bot = CQHttp::Bot.connect host: host, port: port
+  #   CQHttp::Bot.connect host: host, port: port {|bot| ... }
   class Bot
-    Sender = Struct.new(:age, :member_role, :card, :qqlevel, :nickname, :title, :sex)
+    # 发送者消息
+    #
+    # @age [String]
+    # @param port [Number]
+    Sender = Struct.new(:age, :member_role, :card, :user_id, :qqlevel, :nickname, :title, :sex)
     Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message)
     
     # 连接 ws
     #
     # @param host [String]
     # @param port [Number]
-    # @return [Class]
     def self.connect(host:, port:)
       url = URI::WS.build(host: host, port: port)
       Api.setUrl()
@@ -100,7 +103,7 @@ module CQHttp
           Utils.log "连接成功, BotQQ: #{@selfID}"
           emit :logged, @selfID
         end
-        Utils.log msg, Logger::DEBUG if msg['meta_event_type'] != 'heartbeat' # 过滤心跳
+        Utils.log data, Logger::DEBUG if msg['meta_event_type'] != 'heartbeat' # 过滤心跳
         case msg['post_type']
         #
         # 请求事件
@@ -136,6 +139,7 @@ module CQHttp
         #
         when 'message'
           tar.user_id = msg['user_id'] # 用户id
+          sdr.user_id = msg['sender']['user_id'] # 用户id
           tar.message_id = msg['message_id'] # 消息id
           tar.message = msg['message'] # 消息内容
           sdr.age = msg['sender']['age'] # 年龄

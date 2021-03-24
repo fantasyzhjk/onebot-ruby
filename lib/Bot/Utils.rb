@@ -6,9 +6,9 @@ module CQHttp
         logger.level = 'INFO'
         logger.formatter = proc do |severity, datetime, progname, msg|
             if progname == nil
-                "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}][#{severity}]: #{msg.gsub(/\n/,'\n').gsub(/\r/,'\r') }\n"
+                "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}][#{severity}]: #{msg.to_s.gsub(/\n/,'\n').gsub(/\r/,'\r') }\n"
             else
-                "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}][#{progname}][#{severity}]: #{msg.gsub(/\n/,'\n').gsub(/\r/,'\r') }\n"
+                "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}][#{progname}][#{severity}]: #{msg.to_s.gsub(/\n/,'\n').gsub(/\r/,'\r') }\n"
             end
         end
         logger
