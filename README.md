@@ -1,7 +1,7 @@
 # RUBY-CQHTTP
 
 [![Gem Version](https://badge.fury.io/rb/ruby-cqhttp.svg)](https://badge.fury.io/rb/ruby-cqhttp)
-[![yard docs](http://img.shields.io/badge/yard-docs-blue.svg)](https://www.rubydoc.info/gems/ruby-cqhttp)
+[![yard docs](http://img.shields.io/badge/yard-docs-blue.svg)](https://rubydoc.info/github/fantasyzhjk/ruby-cqhttp)
 
 一个基于 OneBot 标准的 QQ 机器人框架
 
