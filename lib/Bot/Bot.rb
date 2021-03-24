@@ -4,10 +4,6 @@ module CQHttp
   # Example:
   #   CQHttp::Bot.connect host: host, port: port {|bot| ... }
   class Bot
-    # 发送者消息
-    #
-    # @age [String]
-    # @param port [Number]
     Sender = Struct.new(:age, :member_role, :card, :user_id, :qqlevel, :nickname, :title, :sex)
     Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message)
     
