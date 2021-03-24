@@ -5,7 +5,7 @@ module CQHttp
   #   CQHttp::Bot.connect host: host, port: port {|bot| ... }
   class Bot
     Sender = Struct.new(:age, :member_role, :card, :user_id, :qqlevel, :nickname, :title, :sex)
-    Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message)
+    Target = Struct.new(:messagetype, :time, :group_id, :user_id, :message_id, :message, :raw_message)
     
     # 连接 ws
     #
@@ -138,6 +138,7 @@ module CQHttp
           sdr.user_id = msg['sender']['user_id'] # 用户id
           tar.message_id = msg['message_id'] # 消息id
           tar.message = msg['message'] # 消息内容
+          tar.raw_message = msg['raw_message'] # 消息内容
           sdr.age = msg['sender']['age'] # 年龄
           sdr.nickname = msg['sender']['nickname'] # 原有用户名
           sdr.sex = msg['sender']['sex'] # 性别

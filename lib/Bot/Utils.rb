@@ -1,11 +1,8 @@
 module CQHttp
-  # 各种工具包
-  #
-  # Example:
-  #   CQHttp::Utils.log str, Logger::INFO, appName
   class Utils
     attr_accessor :stdLogger, :fileLogger, :loggerFile
     class << self
+
       # 初始化日志
       #
       # @param loggerFile [String]
