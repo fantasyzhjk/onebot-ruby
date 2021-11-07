@@ -1,2 +1,11 @@
 ruby-cqhttp-*.gem
 Gemfile.lock
+
+# debug files
+data/
+logs/
+vendor/
+go-cqhttp*
+session.token
+device.json
+config.yml
