@@ -1,11 +1,11 @@
-require "../lib/onebot-ruby"
+require '../lib/onebot-ruby'
 
-logger = Onebot::Logging::Logger.new().setLoggerLevel(Logger::INFO)
-api = Onebot::Http::API.new().setLogger(logger)
+logger = Onebot::Logging::Logger.new.setLoggerLevel(Logger::INFO)
+api = Onebot::Http::API.new.setLogger(logger)
 
-Onebot::Core.connect url: "ws://tyun.fantasyzhjk.top:7700", logger: logger do |bot|
-  bot.on :logged do |botQQ|
-    logger.log("我开了欸")
+Onebot::Core.connect url: 'ws://localhost:7700', logger: logger, options: { headers: { 'Authorization' => 'Bearer xxxxxxxxxxxx' } } do |bot|
+  bot.on :logged do |_botqq|
+    logger.log('我开了欸')
   end
 
   bot.on :privateMessage do |session|

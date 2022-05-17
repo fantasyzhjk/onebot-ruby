@@ -9,10 +9,10 @@ module Onebot
     # @param host [String]
     # @param port [Number]
     # @return [WebSocket]
-    def self.connect(url:, logger: nil)
-      client = ::Onebot::WebSocket::Client.new(url: url, logger: logger)
+    def self.connect(url:, logger: nil, protocols: nil, options: {})
+      client = ::Onebot::WebSocket::Client.new(url:, logger:)
       yield client if block_given?
-      client.connect
+      client.connect(protocols, options)
       client
     end
   end
