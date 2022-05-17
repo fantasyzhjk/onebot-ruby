@@ -32,7 +32,7 @@ gem 'ruby-cqhttp'
 ## 示例
 
 ```ruby
-require 'ruby-cqhttp'
+require 'onebot-ruby'
 
 logger = Onebot::Logging::Logger.new().setLoggerLevel(Logger::INFO) # 如果需要 logger 可以直接建立
 api = Onebot::Http::API.new().setLogger(logger)
@@ -66,3 +66,5 @@ Onebot::Core.connect url: "ws://127.0.0.1:6700", logger: logger do |bot|
   end
 end
 ```
+
+**具体使用方法请查看 tests*
