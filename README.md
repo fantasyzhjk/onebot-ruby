@@ -42,10 +42,10 @@ Onebot::Core.connect url: "ws://127.0.0.1:6700", logger: logger do |bot|
     logger.log('我开了欸')
   end
 
-  bot.on :message do |session|
+  bot.on :message do |data|
     logger.log('我收到消息了欸')
     # 复读
-    bot.sendMessage(session.message, session)
+    bot.sendMessage(data.message, data)
   end
 
   # 获取并发出好友撤回的消息

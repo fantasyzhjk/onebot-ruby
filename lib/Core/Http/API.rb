@@ -31,7 +31,7 @@ module Onebot
       # @param url [URI]
       # @return [Hash]
       def setGroupName(group_id, group_name)
-        data = send('set_group_name', { group_id: group_id.to_i, group_name: })
+        data = sendReq('set_group_name', { group_id: group_id.to_i, group_name: })
         if data['status'] == 'ok'
           @logger.log '设置群头像成功'
         else
@@ -46,7 +46,7 @@ module Onebot
       # @param url [URI]
       # @return [Hash]
       def getImage(file)
-        data = send('get_image', { file: })
+        data = sendReq('get_image', { file: })
         if data['status'] == 'ok'
           @logger.log '下载图片成功'
         else
@@ -61,7 +61,7 @@ module Onebot
       # @param url [URI]
       # @return [Hash]
       def get_msg(message_id)
-        data = send('get_msg', { message_id: })
+        data = sendReq('get_msg', { message_id: })
         if data['status'] == 'ok'
           @logger.log '消息获取成功'
         else
@@ -77,7 +77,7 @@ module Onebot
       # @param url [URI]
       # @return [Hash]
       def sendPrivateMessage(msg, user_id)
-        data = send('send_private_msg', { user_id:, message: msg })
+        data = sendReq('send_private_msg', { user_id:, message: msg })
         if data['status'] == 'ok'
           message_id = data['data']['message_id']
           @logger.log "发送至私聊 #{user_id} 的消息: #{msg} (#{message_id})"
@@ -94,7 +94,7 @@ module Onebot
       # @param url [URI]
       # @return [Hash]
       def sendGroupMessage(msg, group_id)
-        data = send('send_group_msg', { group_id:, message: msg })
+        data = sendReq('send_group_msg', { group_id:, message: msg })
         if data['status'] == 'ok'
           message_id = data['data']['message_id']
           @logger.log "发送至群 #{group_id} 的消息: #{msg} (#{message_id})"
@@ -111,7 +111,7 @@ module Onebot
       # @param url [URI]
       # @return [Boolean]
       def acceptFriendRequest(flag, reason = nil)
-        data = send('set_friend_add_request', { flag:, approve: true, remark: reason })
+        data = sendReq('set_friend_add_request', { flag:, approve: true, remark: reason })
         if data['status'] == 'ok'
           @logger.log '已通过好友请求'
           true
@@ -127,7 +127,7 @@ module Onebot
       # @param url [URI]
       # @return [Boolean]
       def refuseFriendRequest(flag)
-        data = send('set_friend_add_request', { flag:, approve: false })
+        data = sendReq('set_friend_add_request', { flag:, approve: false })
         if data['status'] == 'ok'
           @logger.log '已拒绝好友请求'
           true
@@ -144,7 +144,7 @@ module Onebot
       # @param url [URI]
       # @return [Boolean]
       def acceptGroupRequest(flag, sub_type)
-        data = send('set_group_add_request', { flag:, sub_type:, approve: true })
+        data = sendReq('set_group_add_request', { flag:, sub_type:, approve: true })
         if data['status'] == 'ok'
           @logger.log '已通过加群请求'
           true
@@ -162,7 +162,7 @@ module Onebot
       # @param url [URI]
       # @return [Boolean]
       def refuseGroupRequest(flag, sub_type, reason = nil)
-        data = send('set_group_add_request', { flag:, sub_type:, approve: false, reason: })
+        data = sendReq('set_group_add_request', { flag:, sub_type:, approve: false, reason: })
         if data['status'] == 'ok'
           @logger.log '已拒绝加群请求'
           true
@@ -174,7 +174,7 @@ module Onebot
 
       private
 
-      def send(action, params, url = @url)
+      def sendReq(action, params, url = @url)
         url.path = action
         JSON.parse(Utils.httpPost(url, params.to_json))
       end

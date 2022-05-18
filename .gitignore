@@ -9,3 +9,4 @@ go-cqhttp*
 session.token
 device.json
 config.yml
+.yardoc

@@ -14,11 +14,11 @@ App = lambda do |env|
       logger.log('我开了欸')
     end
 
-    bot.on :privateMessage do |session|
-      # p session.message
-      # p session
-      p Onebot::Utils.cqParse(session.message)
-      bot.sendPrivateMessage(session.message, session.userId)
+    bot.on :privateMessage do |data|
+      # p data.message
+      # p data
+      p Onebot::Utils.cqParse(data.message)
+      bot.sendPrivateMessage(data.message, data.userId)
     end
 
     bot.rack_response

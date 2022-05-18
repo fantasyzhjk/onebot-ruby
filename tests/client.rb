@@ -8,8 +8,8 @@ Onebot::Core.connect url: 'ws://localhost:7700', logger: logger, options: { head
     logger.log('我开了欸')
   end
 
-  bot.on :privateMessage do |session|
-    bot.sendMessage(session.message, session)
+  bot.on :privateMessage do |data|
+    bot.sendMessage(session.message, data)
   end
 
   bot.on :notice do |notice_type, data|
