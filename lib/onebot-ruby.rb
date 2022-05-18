@@ -28,11 +28,11 @@ module Onebot
   end
 
   module WebSocket
-    autoload :Session, File.expand_path('Core/Websocket/Session', __dir__)
-    autoload :API, File.expand_path('Core/Websocket/API', __dir__)
-    autoload :Bot, File.expand_path('Core/Websocket/Bot', __dir__)
-    autoload :Client, File.expand_path('Core/Websocket/Client', __dir__)
-    autoload :Server, File.expand_path('Core/Websocket/Server', __dir__)
+    autoload :Session, File.expand_path('Core/WebSocket/Session', __dir__)
+    autoload :API, File.expand_path('Core/WebSocket/API', __dir__)
+    autoload :Bot, File.expand_path('Core/WebSocket/Bot', __dir__)
+    autoload :Client, File.expand_path('Core/WebSocket/Client', __dir__)
+    autoload :Server, File.expand_path('Core/WebSocket/Server', __dir__)
   end
 
   module Http
