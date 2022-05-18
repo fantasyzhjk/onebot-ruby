@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |s|
   s.name = 'ruby-cqhttp'
-  s.version = '0.1.1'
+  s.version = '0.1.2'
   s.summary = '一个基于 OneBot 标准的 QQ 机器人框架'
   s.description = '一个基于 OneBot 标准的 QQ 机器人框架'
   s.authors = ['fantasyzhjk']
