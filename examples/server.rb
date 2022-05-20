@@ -17,7 +17,7 @@ App = lambda do |env|
     bot.on :privateMessage do |data|
       # p data.message
       # p data
-      p Onebot::Utils.cqParse(data.message)
+      p Onebot::Utils.cqParse(data.message) # 将 string 类型的消息解析成 array 类型
       bot.sendPrivateMessage(data.message, data.userId)
     end
 

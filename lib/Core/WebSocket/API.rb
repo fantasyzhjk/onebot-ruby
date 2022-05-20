@@ -54,7 +54,6 @@ module Onebot
       #
       # @param flag [String]
       # @param reason [String]
-      # @param url [URI]
       # @return [Boolean]
       def acceptFriendRequest(flag, reason = nil)
         data = sendReq('set_friend_add_request', { flag:, approve: true, remark: reason })
@@ -70,7 +69,6 @@ module Onebot
       # 拒绝好友邀请
       #
       # @param flag [String]
-      # @param url [URI]
       # @return [Boolean]
       def refuseFriendRequest(flag)
         data = sendReq('set_friend_add_request', { flag:, approve: false })
@@ -87,7 +85,6 @@ module Onebot
       #
       # @param flag [String]
       # @param sub_type [String]
-      # @param url [URI]
       # @return [Boolean]
       def acceptGroupRequest(flag, sub_type)
         data = sendReq('set_group_add_request', { flag:, sub_type:, approve: true })
@@ -105,7 +102,6 @@ module Onebot
       # @param flag [String]
       # @param sub_type [String]
       # @param reason [String]
-      # @param url [URI]
       # @return [Boolean]
       def refuseGroupRequest(flag, sub_type, reason = nil)
         data = sendReq('set_group_add_request', { flag:, sub_type:, approve: false, reason: })

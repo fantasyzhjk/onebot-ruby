@@ -28,7 +28,6 @@ module Onebot
       #
       # @param group_id [Number]
       # @param group_name [String]
-      # @param url [URI]
       # @return [Hash]
       def setGroupName(group_id, group_name)
         data = sendReq('set_group_name', { group_id: group_id.to_i, group_name: })
@@ -43,7 +42,6 @@ module Onebot
       # 获取图片信息
       #
       # @param file [String]
-      # @param url [URI]
       # @return [Hash]
       def getImage(file)
         data = sendReq('get_image', { file: })
@@ -58,7 +56,6 @@ module Onebot
       # 获取消息
       #
       # @param message_id [Number]
-      # @param url [URI]
       # @return [Hash]
       def get_msg(message_id)
         data = sendReq('get_msg', { message_id: })
@@ -74,7 +71,6 @@ module Onebot
       #
       # @param msg [String]
       # @param user_id [Number]
-      # @param url [URI]
       # @return [Hash]
       def sendPrivateMessage(msg, user_id)
         data = sendReq('send_private_msg', { user_id:, message: msg })
@@ -91,7 +87,6 @@ module Onebot
       #
       # @param msg [String]
       # @param group_id [Number]
-      # @param url [URI]
       # @return [Hash]
       def sendGroupMessage(msg, group_id)
         data = sendReq('send_group_msg', { group_id:, message: msg })
@@ -108,7 +103,6 @@ module Onebot
       #
       # @param flag [String]
       # @param reason [String]
-      # @param url [URI]
       # @return [Boolean]
       def acceptFriendRequest(flag, reason = nil)
         data = sendReq('set_friend_add_request', { flag:, approve: true, remark: reason })
@@ -124,7 +118,6 @@ module Onebot
       # 拒绝好友邀请
       #
       # @param flag [String]
-      # @param url [URI]
       # @return [Boolean]
       def refuseFriendRequest(flag)
         data = sendReq('set_friend_add_request', { flag:, approve: false })
@@ -141,7 +134,6 @@ module Onebot
       #
       # @param flag [String]
       # @param sub_type [String]
-      # @param url [URI]
       # @return [Boolean]
       def acceptGroupRequest(flag, sub_type)
         data = sendReq('set_group_add_request', { flag:, sub_type:, approve: true })
@@ -159,7 +151,6 @@ module Onebot
       # @param flag [String]
       # @param sub_type [String]
       # @param reason [String]
-      # @param url [URI]
       # @return [Boolean]
       def refuseGroupRequest(flag, sub_type, reason = nil)
         data = sendReq('set_group_add_request', { flag:, sub_type:, approve: false, reason: })
