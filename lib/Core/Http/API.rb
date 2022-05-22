@@ -11,11 +11,11 @@ module Onebot
 
       # (初始化) 设置API地址
       #
-      # @param apiIp [String]
-      # @param apiPort [Number]
+      # @param host [String]
+      # @param port [Number]
       # @return [URI]
-      def initialize(apiIp: '127.0.0.1', apiPort: 5700)
-        @url = URI::HTTP.build(host: apiIp, port: apiPort)
+      def initialize(host: '127.0.0.1', port: 5700)
+        @url = URI::HTTP.build(host: host, port: port)
         @logger = Logging::EventLogger.new
       end
 
@@ -166,7 +166,7 @@ module Onebot
       private
 
       def sendReq(action, params, url = @url)
-        url.path = action
+        url.path = '/' << action
         JSON.parse(Utils.httpPost(url, params.to_json))
       end
     end

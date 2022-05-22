@@ -1,11 +1,11 @@
-require '../lib/onebot-ruby'
+require 'onebot-ruby'
 
 logger = Onebot::Logging::Logger.new.setLoggerLevel(Logger::INFO)
-api = Onebot::Http::API.new.setLogger(logger)
+api = Onebot::Http::API.new(host: '127.0.0.1', port: 5700).setLogger(logger)
 
 api.sendGroupMessage('Hello World', 123456789)
 
-Onebot::Core.connect url: 'ws://localhost:7700', logger: logger, options: { headers: { 'Authorization' => 'Bearer xxxxxxxxxxxx' } } do |bot|
+Onebot::Core.connect url: 'ws://127.0.0.1:6700', logger: logger, options: { headers: { 'Authorization' => 'Bearer xxxxxxxxxxxx' } } do |bot|
   bot.on :logged do |_botqq|
     logger.log('我开了欸')
   end

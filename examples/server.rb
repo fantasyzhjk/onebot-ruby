@@ -1,33 +1,4 @@
-require '../lib/onebot-ruby'
-require 'faye/websocket'
-require 'rack'
-
-logger = Onebot::Logging::Logger.new.setLoggerLevel(Logger::INFO)
-static  = Rack::File.new(File.dirname(__FILE__))
-options = { ping: 5 }
-
-App = lambda do |env|
-  if Faye::WebSocket.websocket?(env)
-    bot = Onebot::WebSocket::Server.new(env:, logger:, options:)
-
-    bot.on :logged do |_botqq|
-      logger.log('我开了欸')
-    end
-
-    bot.on :privateMessage do |data|
-      # p data.message
-      # p data
-      p Onebot::Utils.cqParse(data.message) # 将 string 类型的消息解析成 array 类型
-      bot.sendPrivateMessage(data.message, data.userId)
-    end
-
-    bot.rack_response
-  else
-    static.call(env)
-  end
-end
-
-def App.log(message); end
+require File.expand_path('../app', __FILE__)
 
 port   = ARGV[0] || 7000
 secure = ARGV[1] == 'tls'

@@ -58,10 +58,10 @@ module Onebot
       def acceptFriendRequest(flag, reason = nil)
         data = sendReq('set_friend_add_request', { flag:, approve: true, remark: reason })
         if parseRet(data)
-          @logger.log '已通过好友请求'
+          @eventLogger.log '已通过好友请求'
           true
         else
-          @logger.log '请求通过失败', Logger::WARN
+          @eventLogger.log '请求通过失败', Logger::WARN
           false
         end
       end
@@ -73,10 +73,10 @@ module Onebot
       def refuseFriendRequest(flag)
         data = sendReq('set_friend_add_request', { flag:, approve: false })
         if parseRet(data)
-          @logger.log '已拒绝好友请求'
+          @eventLogger.log '已拒绝好友请求'
           true
         else
-          @logger.log '请求拒绝失败', Logger::WARN
+          @eventLogger.log '请求拒绝失败', Logger::WARN
           false
         end
       end
@@ -89,10 +89,10 @@ module Onebot
       def acceptGroupRequest(flag, sub_type)
         data = sendReq('set_group_add_request', { flag:, sub_type:, approve: true })
         if parseRet(data)
-          @logger.log '已通过加群请求'
+          @eventLogger.log '已通过加群请求'
           true
         else
-          @logger.log '请求通过失败', Logger::WARN
+          @eventLogger.log '请求通过失败', Logger::WARN
           false
         end
       end
@@ -106,10 +106,10 @@ module Onebot
       def refuseGroupRequest(flag, sub_type, reason = nil)
         data = sendReq('set_group_add_request', { flag:, sub_type:, approve: false, reason: })
         if parseRet(data)
-          @logger.log '已拒绝加群请求'
+          @eventLogger.log '已拒绝加群请求'
           true
         else
-          @logger.log '请求拒绝失败', Logger::WARN
+          @eventLogger.log '请求拒绝失败', Logger::WARN
           false
         end
       end

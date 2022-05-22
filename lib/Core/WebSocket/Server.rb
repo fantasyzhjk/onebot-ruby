@@ -13,14 +13,14 @@ module Onebot
         @eventLogger = Logging::EventLogger.new(logger)
         @ws = Faye::WebSocket.new(env, %w[irc xmpp], options)
         @api = API.new(@ws, @eventLogger)
-        @eventLogger.log(['客户端', '连接', @ws.url, @ws.version], ::Logger::INFO, 'Puma')
+        @eventLogger.log(['客户端', '连接', @ws.url, @ws.version], ::Logger::INFO, 'Server')
 
         @ws.on :message do |event|
           Thread.new { dataParse(event.data) }
         end
 
         @ws.on :close do |event|
-          @eventLogger.log(['客户端', '断开', event.code].to_s, ::Logger::INFO, 'Puma')
+          @eventLogger.log(['客户端', '断开', event.code].to_s, ::Logger::INFO, 'Server')
           @ws = nil
         end
 
