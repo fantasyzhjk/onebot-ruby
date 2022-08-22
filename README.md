@@ -1,4 +1,4 @@
-# onebot-rb
+# OneBot x Ruby!
 
 [![Badge](https://img.shields.io/badge/OneBot-12-black)](https://onebot.dev/)
 [![Gem Version](https://badge.fury.io/rb/ruby-cqhttp.svg)](https://badge.fury.io/rb/ruby-cqhttp)
